@@ -11,19 +11,75 @@ const users = [
   { id: 4, username: "david", role: "user", region: "CH" },
   { id: 5, username: "emma", role: "user", region: "DE" },
   { id: 6, username: "paul", role: "user", region: "DE" },
-  { id: 7, username: "larissa", role: "user", region: "FR" }
+  { id: 7, username: "larissa", role: "user", region: "FR" },
 ];
 
 // Bestellungen
 const orders = [
-  { id: 1774324246475, ownerId: 4, region: "CH", item: "Notebook 1", amount: 1400, internalNote: "Schlechte Zahlungsmoral" },
-  { id: 1774324256808, ownerId: 4, region: "CH", item: "TV", amount: 1740, internalNote: "Vorkasse anfordern" },
-  { id: 1774324264910, ownerId: 5, region: "DE", item: "PlayStation 5", amount: 800, internalNote: "" },
-  { id: 1774324273622, ownerId: 5, region: "DE", item: "Notebook 2", amount: 890, internalNote: "" },
-  { id: 1774324280555, ownerId: 6, region: "DE", item: "Book 1", amount: 56, internalNote: "" },
-  { id: 1774324288338, ownerId: 7, region: "DE", item: "Laser Pointer", amount: 32, internalNote: "Ist unfreundlich" },
-  { id: 1774324297536, ownerId: 3, region: "FR", item: "Notebook 3", amount: 3100, internalNote: "" },
-  { id: 1774324357500, ownerId: 2, region: "DE", item: "Book 2", amount: 76, internalNote: "" }
+  {
+    id: 1774324246475,
+    ownerId: 4,
+    region: "CH",
+    item: "Notebook 1",
+    amount: 1400,
+    internalNote: "Schlechte Zahlungsmoral",
+  },
+  {
+    id: 1774324256808,
+    ownerId: 4,
+    region: "CH",
+    item: "TV",
+    amount: 1740,
+    internalNote: "Vorkasse anfordern",
+  },
+  {
+    id: 1774324264910,
+    ownerId: 5,
+    region: "DE",
+    item: "PlayStation 5",
+    amount: 800,
+    internalNote: "",
+  },
+  {
+    id: 1774324273622,
+    ownerId: 5,
+    region: "DE",
+    item: "Notebook 2",
+    amount: 890,
+    internalNote: "",
+  },
+  {
+    id: 1774324280555,
+    ownerId: 6,
+    region: "DE",
+    item: "Book 1",
+    amount: 56,
+    internalNote: "",
+  },
+  {
+    id: 1774324288338,
+    ownerId: 7,
+    region: "DE",
+    item: "Laser Pointer",
+    amount: 32,
+    internalNote: "Ist unfreundlich",
+  },
+  {
+    id: 1774324297536,
+    ownerId: 3,
+    region: "FR",
+    item: "Notebook 3",
+    amount: 3100,
+    internalNote: "",
+  },
+  {
+    id: 1774324357500,
+    ownerId: 2,
+    region: "DE",
+    item: "Book 2",
+    amount: 76,
+    internalNote: "",
+  },
 ];
 
 function findUserById(id) {
@@ -55,7 +111,7 @@ app.use((req, res, next) => {
     id: dbUser.id,
     username: dbUser.username,
     role: role || dbUser.role,
-    region: region || dbUser.region
+    region: region || dbUser.region,
   };
 
   next();
@@ -85,7 +141,7 @@ app.get("/orders", (req, res) => {
 app.post("/orders/create", (req, res) => {
   const newOrder = {
     id: Date.now(),
-    ...req.body
+    ...req.body,
   };
 
   orders.push(newOrder);
