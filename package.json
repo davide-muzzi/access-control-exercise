@@ -1,0 +1,14 @@
+{
+  "name": "zugriffssteuerung",
+  "version": "1.0.0",
+  "description": "Zugriffssteuerung mit RBAC und ABAC",
+  "main": "app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
