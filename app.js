@@ -3,7 +3,8 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-const allowedRoles = ["admin", "support"];
+const bypassGetUsers = ["admin", "support"];
+const bypassGetAdmin = ["admin"];
 
 // Benutzer
 const users = [
@@ -120,11 +121,9 @@ app.use((req, res, next) => {
 });
 
 app.get("/users", (req, res) => {
-  console.log(req.user);
   if (req.user === null) {
     return res.status(404).json({ error: "User not found" });
-  }
-  if (allowedRoles.includes(req.user.role)) {
+  } else if (bypassGetUsers.includes(req.user.role)) {
     res.json(users);
   } else {
     res.status(403).json({ error: "Forbidden" });
@@ -132,11 +131,13 @@ app.get("/users", (req, res) => {
 });
 
 app.get("/admin", (req, res) => {
-  if (req.query.admin === "true") {
+  if (req.user === null) {
+    return res.status(404).json({ error: "User not found" });
+  } else if (bypassGetAdmin.includes(req.user.role)) {
     return res.json({ message: "Admin access granted" });
+  } else {
+    res.status(403).json({ error: "Forbidden" });
   }
-
-  res.status(403).json({ error: "Forbidden" });
 });
 
 app.get("/orders/:id", (req, res) => {
