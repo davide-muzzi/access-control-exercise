@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
+// Bypass-Listen
 const bypassGetUsers = ["admin", "support"];
 const bypassGetAdmin = ["admin"];
 
@@ -141,8 +142,31 @@ app.get("/admin", (req, res) => {
 });
 
 app.get("/orders/:id", (req, res) => {
-  const order = findOrderById(Number(req.params.id));
-  res.json(order);
+  if (order.id === null) {
+    return res.status(404).json({ error: "Order not found" });
+  } else {
+    switch (req.user?.role) {
+      case "admin":
+        return res.json(findOrderById(Number(req.params.id)));
+      case "support":
+        const order = findOrderById(Number(req.params.id));
+        if (order.region === req.user.region) {
+          return res.json(order);
+        } else {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+      case "user":
+        if (order.ownerId === req.user.id) {
+          return res.json(order);
+        } else {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+      case null:
+        return res.status(404).json({ error: "User not found" });
+      default:
+        return res.status(403).json({ error: "Forbidden" });
+    }
+  }
 });
 
 app.get("/orders", (req, res) => {
