@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
+const allowedRoles = ["admin", "support"];
+
 // Benutzer
 const users = [
   { id: 1, username: "ken", role: "admin", region: "CH" },
@@ -118,7 +120,15 @@ app.use((req, res, next) => {
 });
 
 app.get("/users", (req, res) => {
-  res.json(users);
+  console.log(req.user);
+  if (req.user === null) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  if (allowedRoles.includes(req.user.role)) {
+    res.json(users);
+  } else {
+    res.status(403).json({ error: "Forbidden" });
+  }
 });
 
 app.get("/admin", (req, res) => {
