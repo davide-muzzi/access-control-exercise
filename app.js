@@ -163,6 +163,8 @@ app.get("/orders/:id", (req, res) => {
         }
       case null:
         return res.status(404).json({ error: "User not found" });
+      case NaN:
+        return res.status(400).json({ error: "Bad Request" });
       default:
         return res.status(403).json({ error: "Forbidden" });
     }
