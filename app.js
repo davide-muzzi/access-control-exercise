@@ -191,9 +191,26 @@ app.get("/orders", (req, res) => {
 });
 
 app.post("/orders/create", (req, res) => {
+  if (req.user === null) {
+    return res.status(404).json({ error: "Not Found" });
+  }
+
+  const rawItem = req.body.item;
+  if (typeof rawItem !== "string") {
+    return res.status(400).json({ error: "Bad Request" });
+  }
+
+  const item = rawItem.trim();
+  if (item === "") {
+    return res.status(400).json({ error: "Bad Request" });
+  }
+
   const newOrder = {
     id: Date.now(),
-    ...req.body,
+    ownerId: req.user.id,
+    item: item,
+    amount: "Not specified",
+    internalNote: "Not specified",
   };
 
   orders.push(newOrder);
