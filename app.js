@@ -101,8 +101,6 @@ function findOrderById(id) {
 // Auth-Middleware
 app.use((req, res, next) => {
   const userId = Number(req.header("x-user-id"));
-  const role = req.header("x-role");
-  const region = req.header("x-region");
 
   const dbUser = findUserById(userId);
 
@@ -114,8 +112,8 @@ app.use((req, res, next) => {
   req.user = {
     id: dbUser.id,
     username: dbUser.username,
-    role: role || dbUser.role,
-    region: region || dbUser.region,
+    role: dbUser.role,
+    region: dbUser.region,
   };
 
   next();
@@ -163,7 +161,7 @@ app.get("/orders/:id", (req, res) => {
 
     case "support":
       // Aufgabe 3 + Aufgabe 5
-      if (order.region === !req.user.region) {
+      if (order.region !== req.user.region) {
         return res.status(403).json({ error: "Forbidden" });
       }
       return res.json(order);
@@ -187,7 +185,58 @@ app.get("/orders/:id", (req, res) => {
 });
 
 app.get("/orders", (req, res) => {
-  res.json(orders);
+  if (req.user === null) {
+    return res.status(404).json({ error: "User not found" });
+  } else if (bypassGetAdmin.includes(req.user.role)) {
+    return res.json({ message: "Admin access granted" });
+  } else {
+    res.status(403).json({ error: "Forbidden" });
+  }
+});
+
+app.get("/orders/:id", (req, res) => {
+  const orderId = Number(req.params.id);
+  if (Number.isNaN(orderId)) {
+    return res.status(400).json({ error: "Bad Request" });
+  }
+
+  const order = findOrderById(orderId);
+
+  if (!order) {
+    return res.status(404).json({ error: "Order not found" });
+  }
+
+  if (req.user === null) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  switch (req.user?.role) {
+    case "admin":
+      return res.json(order);
+
+    case "support":
+      // Aufgabe 3 + Aufgabe 5
+      if (order.region !== req.user.region) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      return res.json(order);
+
+    // Aufgabe 4
+    // return res.status(403).json({ error: "Forbidden" });
+
+    case "user":
+      if (order.ownerId !== req.user.id) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      const { internalNote, ...orderWithoutNote } = order;
+      return res.json(orderWithoutNote);
+
+    case undefined:
+      return res.status(404).json({ error: "User not found" });
+
+    default:
+      return res.status(403).json({ error: "Forbidden" });
+  }
 });
 
 app.post("/orders/create", (req, res) => {
