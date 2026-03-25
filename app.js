@@ -162,14 +162,14 @@ app.get("/orders/:id", (req, res) => {
       return res.json(order);
 
     case "support":
-      // Aufgabe 3
-      // if (order.region === !req.user.region) {
-      //   return res.status(403).json({ error: "Forbidden" });
-      // }
-      // return res.json(order);
+      // Aufgabe 3 + Aufgabe 5
+      if (order.region === !req.user.region) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+      return res.json(order);
 
-      // Aufgabe 4
-      return res.status(403).json({ error: "Forbidden" });
+    // Aufgabe 4
+    // return res.status(403).json({ error: "Forbidden" });
 
     case "user":
       if (order.ownerId !== req.user.id) {
