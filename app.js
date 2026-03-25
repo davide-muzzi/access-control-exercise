@@ -142,32 +142,44 @@ app.get("/admin", (req, res) => {
 });
 
 app.get("/orders/:id", (req, res) => {
-  if (order.id === null) {
+  const orderId = Number(req.params.id);
+  if (Number.isNaN(orderId)) {
+    return res.status(400).json({ error: "Bad Request" });
+  }
+
+  const order = findOrderById(orderId);
+
+  if (!order) {
     return res.status(404).json({ error: "Order not found" });
-  } else {
-    switch (req.user?.role) {
-      case "admin":
-        return res.json(findOrderById(Number(req.params.id)));
-      case "support":
-        const order = findOrderById(Number(req.params.id));
-        if (order.region === req.user.region) {
-          return res.json(order);
-        } else {
-          return res.status(403).json({ error: "Forbidden" });
-        }
-      case "user":
-        if (order.ownerId === req.user.id) {
-          return res.json(order);
-        } else {
-          return res.status(403).json({ error: "Forbidden" });
-        }
-      case null:
-        return res.status(404).json({ error: "User not found" });
-      case NaN:
-        return res.status(400).json({ error: "Bad Request" });
-      default:
+  }
+
+  if (req.user === null) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  switch (req.user?.role) {
+    case "admin":
+      return res.json(order);
+
+    case "support":
+      if (order.region === req.user.region) {
+        return res.json(order);
+      } else {
         return res.status(403).json({ error: "Forbidden" });
-    }
+      }
+
+    case "user":
+      if (order.ownerId === req.user.id) {
+        return res.json(order);
+      } else {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+    case undefined:
+      return res.status(404).json({ error: "User not found" });
+
+    default:
+      return res.status(403).json({ error: "Forbidden" });
   }
 });
 
