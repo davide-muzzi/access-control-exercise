@@ -162,18 +162,21 @@ app.get("/orders/:id", (req, res) => {
       return res.json(order);
 
     case "support":
-      if (order.region === req.user.region) {
-        return res.json(order);
-      } else {
-        return res.status(403).json({ error: "Forbidden" });
-      }
+      // Aufgabe 3
+      // if (order.region === !req.user.region) {
+      //   return res.status(403).json({ error: "Forbidden" });
+      // }
+      // return res.json(order);
+
+      // Aufgabe 4
+      return res.status(403).json({ error: "Forbidden" });
 
     case "user":
-      if (order.ownerId === req.user.id) {
-        return res.json(order);
-      } else {
+      if (order.ownerId !== req.user.id) {
         return res.status(403).json({ error: "Forbidden" });
       }
+      const { internalNote, ...orderWithoutNote } = order;
+      return res.json(orderWithoutNote);
 
     case undefined:
       return res.status(404).json({ error: "User not found" });
